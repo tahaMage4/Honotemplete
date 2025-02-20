@@ -20,10 +20,6 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-// app.notFound((c) => {
-//   return c.redirect("/");
-// });
-
 app.notFound((c) => {
   return c.html("<h1 class={headerClass}>Not Found</h1>", 404);
 });

@@ -1,42 +1,21 @@
 import { IdValid, postBookValid } from "../utils/validation";
 
-export const getBooks = (c) =>
-  c.json({
-    books: [
-      {
-        id: 1,
-        name: "Book 1",
-        price: 100,
-        quantity: 10,
-        description: "Book 1 description",
-        author: "Author 1",
-        publisher: "Publisher 1",
-        publish_date: "2022-01-01",
-        created_at: "2022-01-01",
-        updated_at: "2022-01-01",
-        deleted_at: "2022-01-01",
-        created_by: 1,
-        updated_by: 1,
-        deleted_by: 1,
-      },
-      {
-        id: 2,
-        name: "Book 2",
-        price: 100,
-        quantity: 10,
-        description: "Book 1 description",
-        author: "Author 1",
-        publisher: "Publisher 1",
-        publish_date: "2022-01-01",
-        created_at: "2022-01-01",
-        updated_at: "2022-01-01",
-        deleted_at: "2022-01-01",
-        created_by: 1,
-        updated_by: 1,
-        deleted_by: 1,
-      },
-    ],
+import { stream, streamText, streamSSE } from "hono/streaming";
+
+//! streaming
+const books = [];
+export const getBooks = (c) => {
+  return streamText(c, async (stream) => {
+    stream.onAbort(() => {
+      c.text("Aborted!");
+    });
+    for (const book of books) {
+      await stream.writeln(JSON.stringify(book));
+      await stream.sleep(1000);
+    }
+    // await stream.write(`Hono!`);
   });
+};
 
 export const getById = [
   IdValid,
@@ -50,6 +29,7 @@ export const postbook = [
   postBookValid,
   async (c) => {
     const data = await c.req.valid("json");
+    books.push(data);
     return c.json(data);
   },
 ];
